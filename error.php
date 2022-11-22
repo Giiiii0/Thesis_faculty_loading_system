@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Website</title>
+	<title>CCS Faculty Loading System</title>
 	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;900&display=swap" rel="stylesheet">
 	<!--script src="https://kit.fontawesome.com/4b9ba14b0f.js" crossorigin="anonymous"></script-->
 	<link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
