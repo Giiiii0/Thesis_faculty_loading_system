@@ -90,8 +90,7 @@
               <div class="active tab-pane" id="activity">
                 <div class="card">
                   <div class="card-header">
-                    <div style="float: right; padding-left: 20px;" class="form-group">
-                      <!--label for="exampleInputBorder"><code style="color:lightgreen; font-size: 20px;">Lecture Day</code></label-->
+                    <!--div style="float: right; padding-left: 20px;" class="form-group">
                       <select id="selected_faculty_sem" class="custom-select" onchange="faculty_sem_function()">
                         <option value="none">Select Semester</option>
                         <?php
@@ -100,7 +99,7 @@
                           <option value="<?php echo $sem_class_row['Sem_id'] ?>"><?php echo $sem_class_row['Sem_description'] ?></option>
                         <?php } ?>
                       </select>
-                    </div>
+                    </div-->
                     <button style="float: right;" type="button" class="btn_add btn btn-success" data-toggle="modal" data-target="#modal-add"><i class="fas fa-plus-circle"></i> Add Record</button>
                   </div>
                   <div class="card-body">
@@ -123,6 +122,12 @@
                           $faculty_id = $faculty_row['Faculty_id'];
 
                           $fetchTotalUnits = mysqli_fetch_assoc($web_con->query("SELECT SUM(unit_lec) as totalUnits FROM class WHERE Faculty_id = '$faculty_id' AND Subject_id != '0'"));
+
+                          if ($fetchTotalUnits['totalUnits']) {
+                            $totalUnits = $fetchTotalUnits['totalUnits'];
+                          } else {
+                            $totalUnits = 0;
+                          }
 
                           /*if ($faculty_selected_sem == 'none') {
                             $sum_unit_lec = mysqli_fetch_assoc($web_con->query("SELECT sum(unit_lec) as sum_unit_lec FROM class WHERE Faculty_id = '$faculty_id' AND Subject_id != '0'"));
@@ -150,7 +155,7 @@
                             <td><?php echo $faculty_row['LastName'] ?></td>
                             <td><?php echo $faculty_row['PhoneNum'] ?></td>
                             <td><?php echo $faculty_row['address'] ?></td>
-                            <td style="text-align:center;"><?php echo $fetchTotalUnits['totalUnits'] ?></td>
+                            <td style="text-align:center;"><?php echo $totalUnits ?></td>
                             <td>
                               <div class="btn-group">
                                 <button type="button" data-id="<?php echo $faculty_row['Faculty_id'] ?><?php echo $splittercode ?><?php echo $faculty_row['FirstName'] ?><?php echo $splittercode ?><?php echo $faculty_row['MiddleInitial'] ?><?php echo $splittercode ?><?php echo $faculty_row['LastName'] ?><?php echo $splittercode ?><?php echo $faculty_row['PhoneNum'] ?><?php echo $splittercode ?><?php echo $faculty_row['address'] ?>" class="edit_btn btn btn-success" data-toggle="modal" data-target="#modal-edit"><i class="fas fa-pen" aria-hidden="true"></i></button>
