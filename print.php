@@ -194,7 +194,7 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
                     <?php echo $lec_time_start ?><?php echo $lec_time_end ?><br>
                     <?php echo $lab_time_start ?><?php echo $lab_time_end ?>
                   </td>
-                  <td>
+                  <td style="width: 70px;">
                     <?php echo $room_lec ?><br>
                     <?php echo $room_lab ?>
                   </td>
