@@ -1,5 +1,7 @@
 <?php
 include('functions.php');
+
+//=====================================PHPMailer library  START
 require_once "PHPMailer.php";
 require_once "Exception.php";
 require_once "SMTP.php";
@@ -7,6 +9,7 @@ require_once "SMTP.php";
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
+//=====================================PHPMailer library END
 
 //=====================================VARIABLES START
 $converted_start_time = 'Empty';
