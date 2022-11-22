@@ -251,7 +251,7 @@ if ($action == '') {
                               <th></th>
                               <th></th>
                               <th>Total Units</th>
-                              <th style="text-align:center;"><?php echo $unit_sum?></th>
+                              <th id="unitstotal" style="text-align:center;">0</th>
                             </tr>
                           </tfoot>
                         </table>
@@ -354,6 +354,16 @@ if ($action == '') {
     $(document).ready(function() {
       $(".sem_view #semester").val(<?php echo $view_sem ?>);
     });
+  </script>
+  <script>
+    updateSubTotal(); // Initial call
+    function updateSubTotal() {
+      var table = document.getElementById("example1");
+      let subTotal = Array.from(table.rows).slice(1).reduce((total, row) => {
+        return total + parseFloat(row.cells[7].innerHTML);
+      }, 0);
+      document.getElementById("unitstotal").innerHTML = subTotal;
+    }
   </script>
   <!--This is for View Javascript-----------------------------------------------------------------------END-->
 </body>

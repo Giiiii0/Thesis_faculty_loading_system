@@ -2,9 +2,18 @@
 include('functions/process.php');
 
 $facultyID = isset($_GET['print']) ? $_GET['print'] : '';
+$value = isset($_GET['val']) ? $_GET['val'] : '';
 $selectedSem = $_SESSION['sem'];
 
-$getClassData = mysqli_query($web_con, "SELECT * FROM class WHERE Faculty_id = '$facultyID' AND sem_id = '$selectedSem'");
+if ($value <= 9) {
+  $type = 'Package Load';
+  $getClassData = mysqli_query($web_con, "SELECT * FROM class WHERE Faculty_id = '$facultyID' AND sem_id = '$selectedSem' AND students_count <= 9");
+} else {
+  $type = 'Regular Load';
+  $getClassData = mysqli_query($web_con, "SELECT * FROM class WHERE Faculty_id = '$facultyID' AND sem_id = '$selectedSem' AND students_count > 9");
+}
+
+//$getClassData = mysqli_query($web_con, "SELECT * FROM class WHERE Faculty_id = '$facultyID' AND sem_id = '$selectedSem'");
 $get_faculty = mysqli_fetch_assoc($web_con->query("SELECT * FROM faculty WHERE Faculty_id ='$facultyID'"));
 $get_semSY = mysqli_fetch_assoc($web_con->query("SELECT * FROM semester WHERE Sem_id ='$selectedSem'"));
 
@@ -72,7 +81,9 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
             </thead>
             <thead>
               <th style="text-align: center; font-size:20px;" colspan="9">
-                <b style="padding-left:100px;">Faculty Teaching Load - <input style="border: 0; border-bottom: 0px;" type="text" class="signature" placeholder="Click Me To Edit" /></b><br>
+                <b>Faculty Teaching Load (<?php echo $type ?>)
+                  <!--input style="border: 0; border-bottom: 0px;" type="text" class="signature" placeholder="Click Me To Edit" /-->
+                </b><br>
                 <?php echo $semester ?> SY <?php echo $SY ?>
               </th>
             </thead>
@@ -111,11 +122,12 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
                 <th>Subject Code</th>
                 <th>Description</th>
                 <th>Day(s)</th>
-                <th>Units</th>
+                <th style="text-align: center;">Units</th>
                 <th>Time</th>
                 <th>Room</th>
-                <th>Section</th>
-                <th>Credit Hours</th>
+                <th style="text-align: center;">Section</th>
+                <th style="text-align: center;">Credit Hours</th>
+                <th style="text-align: center;">Students</th>
               </tr>
             </thead>
             <!--tbody>
@@ -172,11 +184,12 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
                 <tr>
                   <td style="padding-top:25px;"><?php echo $fetchSubjects['offer_no'] ?></td>
                   <td style="padding-top:25px;"><?php echo $fetchSubjects['Course_code'] ?></td>
-                  <td style="width: 200px; font-size: 11px;"><b><?php echo $fetchSubjects['Description'] ?></b></td>
+                  <!--td style="width: 200px; font-size: 11px;"><b><?php echo $fetchSubjects['Description'] ?></b></td-->
+                  <td style="width: 200px;"><?php echo $fetchSubjects['Description'] ?></td>
                   <td>
                     <?php echo $lec_day ?><br><?php echo $lab_day ?>
                   </td>
-                  <td style="padding-top:25px;"><?php echo $fetchSubjects['units']; ?></td>
+                  <td style="padding-top:25px; text-align: center;"><?php echo $fetchSubjects['units']; ?></td>
                   <td style="width: 160px;">
                     <?php echo $lec_time_start ?><?php echo $lec_time_end ?><br>
                     <?php echo $lab_time_start ?><?php echo $lab_time_end ?>
@@ -185,8 +198,9 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
                     <?php echo $room_lec ?><br>
                     <?php echo $room_lab ?>
                   </td>
-                  <td style="padding-top:25px;">BSIT</td>
-                  <td style="padding-top:25px;">0</td>
+                  <td style="padding-top:25px; text-align: center;">BSIT</td>
+                  <td style="padding-top:25px; text-align: center;" oninput="updateSubTotal()" contenteditable=true>0</td>
+                  <td style="padding-top:25px; text-align: center;"><?php echo $rowData['students_count'] ?></td>
                 </tr>
               <?php } ?>
             </tbody>
@@ -223,17 +237,21 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
       </div>
     </section>
   </div>
-  <script>
+  <!--script>
     window.addEventListener("load", window.print());
-  </script>
+  </script-->
   <script>
     updateSubTotal(); // Initial call
     function updateSubTotal() {
       var table = document.getElementById("MyTable");
-      let subTotal = Array.from(table.rows).slice(5).reduce((total, row) => {
+      let unitTotal = Array.from(table.rows).slice(5).reduce((total, row) => {
         return total + parseFloat(row.cells[4].innerHTML);
       }, 0);
-      document.getElementById("unitstotal").innerHTML = subTotal;
+      let hrsTotal = Array.from(table.rows).slice(5).reduce((total, row) => {
+        return total + parseFloat(row.cells[8].innerHTML);
+      }, 0);
+      document.getElementById("unitstotal").innerHTML = unitTotal;
+      document.getElementById("hrstotal").innerHTML = hrsTotal;
     }
   </script>
 </body>

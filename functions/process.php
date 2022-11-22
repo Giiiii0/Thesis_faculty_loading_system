@@ -1,5 +1,12 @@
 <?php
 include('functions.php');
+require_once "PHPMailer.php";
+require_once "Exception.php";
+require_once "SMTP.php";
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
 
 //=====================================VARIABLES START
 $converted_start_time = 'Empty';
@@ -34,6 +41,15 @@ if (isset($_POST["faculty_request_id"])) {
     request();
 }
 //-------------------------------------------------------------------Request POST END---
+
+//-------------------------------------------------------------------ChangePass POST START---
+if (isset($_POST["email"])) {
+    requestchangePass();
+}
+if (isset($_POST["pass1"])) {
+    changePass();
+}
+//-------------------------------------------------------------------ChangePass POST END---
 
 //-------------------------------------------------------------------Faculty POST START---
 if (isset($_POST["fid"])) {
@@ -163,6 +179,104 @@ $get_class = mysqli_query($web_con, "SELECT * FROM class WHERE Subject_id != 0 A
 $all_data = mysqli_query($web_con, "SELECT * FROM check_log WHERE status = 'okay' AND session = '$data_session'");
 //===================================================================Queries END==
 
+//-------------------------------------------------------------------ChangePass Function Start--->
+function requestchangePass()
+{
+    global $web_con;
+    $email = $_POST["email"];
+
+    $checkIfExistEmail = mysqli_fetch_assoc($web_con->query("SELECT * FROM user WHERE email = '$email'"));
+    if ($email == '') {
+        echo 2;
+        return;
+    } else if ($checkIfExistEmail) {
+        $userID = $checkIfExistEmail['id'];
+        $checkExpirationLink = mysqli_fetch_assoc($web_con->query("SELECT * FROM request_log WHERE request_expiration > NOW() AND request_id = '$userID'"));
+        if ($checkExpirationLink) {
+            $not_expire_link = $checkExpirationLink['request_link'];
+            echo '1,' . $not_expire_link;
+            $fullName = $checkIfExistEmail['name'] . ' ' . $checkIfExistEmail['name'] . '. ' . $checkIfExistEmail['name'];
+            $link = 'http://' . $_SERVER['HTTP_HOST'] . '/changepass/?link=' . $not_expire_link;
+            sendMail($email, $fullName, $link);
+            return;
+        }
+        $session = request_session_generator();
+        $ran_string = generateRandomString();
+        $shuffled_data = str_shuffle($ran_string . '' . $session);
+        if (mysqli_query($web_con, "INSERT INTO request_log (request_id,request_link,request_session,request_expiration,request_datetime) VALUE ('$userID','$shuffled_data','$session',date_add(Now(),interval 1 day),Now())")) {
+            echo '1,' . $shuffled_data;
+            $fullName = $checkIfExistEmail['name'] . ' ' . $checkIfExistEmail['name'] . '. ' . $checkIfExistEmail['name'];
+            $link = 'http://' . $_SERVER['HTTP_HOST'] . '/changepass/?link=' . $shuffled_data;
+            sendMail($email, $fullName, $link);
+            return;
+        } else {
+            echo 101919;
+            return;
+        }
+    } else {
+        echo 3;
+    }
+    //echo $email;
+}
+
+function changePass()
+{
+    global $web_con;
+    $pass1 = $_POST["pass1"];
+    $pass2 = $_POST["pass2"];
+    $link = $_POST["link"];
+
+    $getID = mysqli_fetch_assoc($web_con->query("SELECT * FROM request_log WHERE request_link = '$link' AND request_expiration > NOW()"));
+
+    if (!$pass1 || !$pass2) {
+        echo 2;
+        return;
+    }
+    if ($pass1 != $pass2) {
+        echo 3;
+        return;
+    }
+
+    if ($getID) {
+        $userID = $getID['request_id'];
+        if (mysqli_query($web_con, ("UPDATE user SET password = '$pass2' WHERE id ='$userID'"))) {
+            if (mysqli_query($web_con, ("UPDATE request_log SET request_expiration = NOW() WHERE request_link = '$link'"))) {
+                echo 1;
+            }
+        }
+    } else {
+        echo 101919;
+    }
+}
+
+function sendMail($email, $name, $link)
+{
+    $mail = new PHPMailer(true);
+    //$mail->SMTPDebug = 3;      
+    $mail->SMTPDebug = 0;
+    $mail->isSMTP();
+    $mail->Host = 'smtp-relay.sendinblue.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'tinggas.imccccs@gmail.com';
+    $mail->Password = 'sAcgIk9EKTCMmNpt';
+    $mail->SMTPSecure = 'tsl';
+    $mail->Port = 587;
+    $mail->From = 'IMCC_School@gmail.com';
+    $mail->FromName = 'CCS Faculty Loading System';
+    $mail->addAddress($email, $name);
+    $mail->isHTML(true);
+    $mail->Subject = 'Forgot/Change password';
+    $mail->Body = 'Click the link to proceed -> ' . $link;
+    $mail->AltBody = 'Body in plain text for non-HTML mail clients';
+    $mail->send();
+    /*try {
+        $mail->send();
+        echo "Message has been sent successfully";
+    } catch (Exception $e) {
+        echo "Mailer Error: " . $mail->ErrorInfo;
+    }*/
+}
+//-------------------------------------------------------------------ChangePass Function END--->
 
 //-------------------------------------------------------------------Request Function Start--->
 function request()

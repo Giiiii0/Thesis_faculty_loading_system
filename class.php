@@ -173,7 +173,7 @@
                     <div class="btn-group">
                       <!--button type="button" data-id="" class="load_btn btn btn-success" disabled><i class="fas fa-pen" aria-hidden="true"></i></button-->
                       <button type="button" data-id="<?php echo $class_row['id'] ?>" class="class_remove btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                      <a href="/print/?print=<?php echo $class_row['Faculty_id'] ?>" rel="noopener" target="_blank" class="btn btn-default"><i class="fas fa-print"></i></a>
+                      <a href="/print/?print=<?php echo $class_row['Faculty_id'] ?>&val=<?php echo $class_row['students_count'] ?>" rel="noopener" target="_blank" class="btn btn-default"><i class="fas fa-print"></i></a>
                     </div>
                   </td>
 

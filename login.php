@@ -114,18 +114,19 @@ include("functions/process.php");
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-8">
+        <div class="">
+          <div class="col-12">
+            <button type="submit" id="login" name="login" class="login btn btn-primary btn-block">
+              <span class="button__text"><i id="loading" class="fa fa-street-view" aria-hidden="true"></i> Sign In</span>
+            </button>
+          </div>
+          <div class="col-12">
             <div class="icheck-primary">
               <p class="mb-1">
-                <a title="Faculty only" href="/request">View your Schedules?</a>
+                <a title="Faculty only" href="/request">View your Schedules?</a><br>
+                <a title="Faculty only" href="/password">Forgot/Change password?</a>
               </p>
             </div>
-          </div>
-          <div class="col-4">
-            <button type="submit" id="login" name="login" class="login btn btn-primary btn-block">
-              <span class="button__text"><i class="fa fa-street-view" aria-hidden="true"></i> Sign In</span>
-            </button>
           </div>
         </div>
         <!--/form-->
