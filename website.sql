@@ -11,7 +11,7 @@
  Target Server Version : 100422
  File Encoding         : 65001
 
- Date: 22/11/2022 22:27:19
+ Date: 05/12/2022 23:34:38
 */
 
 SET NAMES utf8mb4;
@@ -64,7 +64,7 @@ CREATE TABLE `class`  (
   `status` int NOT NULL COMMENT '1 = Disabled / 2 = Active',
   `date_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of class
@@ -86,6 +86,11 @@ INSERT INTO `class` VALUES (14, '3', 3, 0, 10003, '2', '0', '1', '08:00:00', '09
 INSERT INTO `class` VALUES (15, '20', 3, 0, 10003, '2', '0', '1', '08:00:00', '12:00:00', '00:00:00', '00:00:00', '0', 'SAT', '0', 0, '2022-11-21 17:36:12');
 INSERT INTO `class` VALUES (16, '2', 3, 3, 10005, '3', '3', '1', '13:00:00', '14:00:00', '14:00:00', '15:30:00', 'MTH', 'MTH', '9', 0, '2022-11-21 17:42:11');
 INSERT INTO `class` VALUES (17, '5', 3, 3, 10005, '3', '1', '1', '15:30:00', '16:30:00', '16:30:00', '18:00:00', 'MTH', 'MTH', '8', 0, '2022-11-21 17:48:14');
+INSERT INTO `class` VALUES (18, '0', 0, 0, 10003, '0', '0', '2', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', '0', NULL, 0, '2022-11-22 23:05:55');
+INSERT INTO `class` VALUES (19, '0', 0, 0, 10004, '0', '0', '2', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', '0', NULL, 0, '2022-11-22 23:05:55');
+INSERT INTO `class` VALUES (20, '0', 0, 0, 10005, '0', '0', '2', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', '0', NULL, 0, '2022-11-22 23:05:55');
+INSERT INTO `class` VALUES (21, '0', 0, 0, 10006, '0', '0', '2', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', '0', NULL, 0, '2022-11-22 23:05:55');
+INSERT INTO `class` VALUES (22, '0', 0, 0, 10007, '0', '0', '2', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0', '0', NULL, 0, '2022-11-22 23:05:55');
 
 -- ----------------------------
 -- Table structure for faculty
@@ -115,6 +120,25 @@ INSERT INTO `faculty` VALUES (10006, 'Joselito', 'Aban', 'L', '095478945617', 'I
 INSERT INTO `faculty` VALUES (10007, 'Charmie', 'Jariol', 'M', '09632874189', 'Iligan City', 0, '2022-11-21 15:34:48');
 
 -- ----------------------------
+-- Table structure for login_atempts
+-- ----------------------------
+DROP TABLE IF EXISTS `login_atempts`;
+CREATE TABLE `login_atempts`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `atempts` int NOT NULL,
+  `atempt_rest` datetime NULL DEFAULT NULL,
+  `atempt_created` datetime NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of login_atempts
+-- ----------------------------
+INSERT INTO `login_atempts` VALUES (1, 'admin', 5, '2022-12-05 23:29:45', '2022-12-05 23:21:18');
+INSERT INTO `login_atempts` VALUES (2, 'admin', 4, NULL, '2022-12-05 23:30:06');
+
+-- ----------------------------
 -- Table structure for request_log
 -- ----------------------------
 DROP TABLE IF EXISTS `request_log`;
@@ -126,7 +150,7 @@ CREATE TABLE `request_log`  (
   `request_expiration` datetime NULL DEFAULT NULL,
   `request_datetime` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of request_log
@@ -134,6 +158,7 @@ CREATE TABLE `request_log`  (
 INSERT INTO `request_log` VALUES (1, 1, '12U02jG2sR120o1bA21VN', '20221122101', '2022-11-22 22:11:51', '2022-11-22 21:47:53');
 INSERT INTO `request_log` VALUES (2, 1, 'QjZ22R021kYi2C0YY2112', '20221122102', '2022-11-22 22:18:52', '2022-11-22 22:18:17');
 INSERT INTO `request_log` VALUES (3, 1, 'b1G222yN12zA1sJ3O00M2', '20221122103', '2022-11-23 22:20:22', '2022-11-22 22:20:22');
+INSERT INTO `request_log` VALUES (4, 10003, 'ULXVR222v20011IL21s4i', '20221122104', '2022-11-23 22:34:05', '2022-11-22 22:34:05');
 
 -- ----------------------------
 -- Table structure for room
@@ -165,12 +190,13 @@ CREATE TABLE `semester`  (
   `School_year` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `date_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`Sem_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of semester
 -- ----------------------------
 INSERT INTO `semester` VALUES (1, '1', '2022-2023 1st Semester', '2022-2023', '2022-11-21 15:07:11');
+INSERT INTO `semester` VALUES (2, '2', '2022-2023 2nd Semester', '2022-2023', '2022-11-22 23:05:55');
 
 -- ----------------------------
 -- Table structure for subject

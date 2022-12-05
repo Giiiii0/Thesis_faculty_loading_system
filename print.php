@@ -56,13 +56,15 @@ $faculty_display_name = $faculty_fname . ' ' . $MI . '. ' . $faculty_lname;
           <h2 class="page-header">
             <div class="row">
               <div class="col-4">
-                <img width="100px" height="100px" src="../dist/img/IMCC.png" alt="Visa">
+                <img style="margin-left: 120px;" width="100px" height="100px" src="../dist/img/IMCC.png" alt="Visa">
               </div>
               <div style="margin-top: 20px;" class="col-5">
                 <b>Iligan Medical Center College</b>
               </div>
               <div class="col-3">
-                <small class="float-right"><img width="100px" height="100px" src="../dist/img/CCS.png" alt="Visa"></small>
+                <small style="margin-right: 120px;" class="float-right">
+                  <img width="100px" height="100px" src="../dist/img/CCS.png" alt="Visa">
+                </small>
               </div>
             </div>
           </h2>

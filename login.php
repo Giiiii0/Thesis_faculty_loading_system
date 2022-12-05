@@ -17,6 +17,7 @@ include("functions/process.php");
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <link rel="stylesheet" href="../plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
   <link rel="stylesheet" href="../dist/css/website.min.css">
   <style>
     .button {
@@ -114,21 +115,24 @@ include("functions/process.php");
             </div>
           </div>
         </div>
-        <div class="">
-          <div class="col-12">
-            <button type="submit" id="login" name="login" class="login btn btn-primary btn-block">
-              <span class="button__text"><i id="loading" class="fa fa-street-view" aria-hidden="true"></i> Sign In</span>
-            </button>
-          </div>
-          <div class="col-12">
-            <div class="icheck-primary">
-              <p class="mb-1">
-                <a title="Faculty only" href="/request">View your Schedules?</a><br>
-                <a title="Faculty only" href="/password">Forgot/Change password?</a>
-              </p>
+        <form action="#" id="my_captcha_form">
+          <div class="">
+            <div class="col-12">
+              <button type="submit" id="login" name="login" class="login btn btn-primary btn-block">
+                <span class="button__text"><i id="loading" class="fa fa-street-view" aria-hidden="true"></i> Sign In</span>
+              </button>
+            </div>
+            <div class="col-12">
+              <div style="margin-top: 10px;" class="g-recaptcha" data-sitekey="6LddVlgjAAAAALk0-U6lEZVf5IzVUiuFQdXzo-2A"></div>
+              <div class="icheck-primary">
+                <p class="mb-1">
+                  <a title="Faculty only" href="/request">View your Schedules?</a><br>
+                  <a title="Faculty only" href="/password">Forgot/Change password?</a>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </form>
         <!--/form-->
         <!--div class="social-auth-links text-center mt-2 mb-3">
           <a href="../request" class="btn btn-block btn-primary">
@@ -148,41 +152,73 @@ include("functions/process.php");
       </div>
     </div>
   </div>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="../plugins/sweetalert2/sweetalert2.min.js"></script>
   <script src="../plugins/jquery/jquery.min.js"></script>
   <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../dist/js/website.min.js"></script>
   <script>
     $(document).on("click", ".login", function() {
-      document.getElementById("login").classList.add("button--loading");
-      var username = document.getElementById("username").value;
-      var password = document.getElementById("password").value;
-      $.ajax({
-        type: "POST", //type of method
-        url: "../functions/process.php", //your page
-        data: {
-          username: username,
-          password: password
-        }, // passing the values
-        success: function(res) {
-          if (res == 1) {
-            setTimeout(function() {
-              window.location.href = '../';
-            }, 1000);
-          } else if (res == 2) {
-            //document.getElementById("selected_sem").style.borderColor = "red";
-            setTimeout(function() {
-              document.getElementById("clear").innerHTML = "";
-              document.getElementById("message").innerHTML = "Invalid username or password!";
-              document.getElementById("login").classList.remove("button--loading");
-            }, 1000);
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error ' + res,
-              text: 'Please contact the admin!'
-            })
-          }
+      document.getElementById("my_captcha_form").addEventListener("submit", function(evt) {
+        evt.preventDefault();
+        document.getElementById("login").classList.add("button--loading");
+
+        var response = grecaptcha.getResponse();
+        if (response.length == 0) {
+          document.getElementById("clear").innerHTML = "";
+          document.getElementById("message").innerHTML = "Please check captch first!";
+          document.getElementById("login").classList.remove("button--loading");
+          return false;
         }
+        setTimeout(function() {
+          grecaptcha.reset();
+        }, 1000);
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        $.ajax({
+          type: "POST", //type of method
+          url: "../functions/process.php", //your page
+          data: {
+            username: username,
+            password: password,
+            recaptcha: response
+          }, // passing the values
+          success: function(res) {
+            if (res == 1) {
+              setTimeout(function() {
+                window.location.href = '../';
+              }, 1000);
+            } else if (res == 2) {
+              //document.getElementById("selected_sem").style.borderColor = "red";
+              setTimeout(function() {
+                document.getElementById("clear").innerHTML = "";
+                document.getElementById("message").innerHTML = "Invalid username or password!";
+                document.getElementById("login").classList.remove("button--loading");
+              }, 1000);
+            } else if (res == 3) {
+              //document.getElementById("selected_sem").style.borderColor = "red";
+              setTimeout(function() {
+                document.getElementById("clear").innerHTML = "";
+                document.getElementById("message").innerHTML = "You have reached login attempt limit. Please try again after 5 minutes";
+                document.getElementById("login").classList.remove("button--loading");
+              }, 1000);
+            } else if (res == 4) {
+              /*//document.getElementById("selected_sem").style.borderColor = "red";
+              setTimeout(function() {
+                document.getElementById("clear").innerHTML = "";
+                document.getElementById("message").innerHTML = "Please check captch first!";
+                document.getElementById("login").classList.remove("button--loading");
+              }, 1000);*/
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error ' + res,
+                text: 'Please contact the admin!'
+              })
+            }
+          }
+        });
       });
     });
   </script>

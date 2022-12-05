@@ -1289,13 +1289,63 @@ function login()
 
     $username = web($_POST["username"]);
     $password = web($_POST["password"]);
-    $check_account = mysqli_fetch_assoc($web_con->query("SELECT * FROM user WHERE username = '$username' AND password = '$password'"));
+    $recaptcha = web($_POST["recaptcha"]);
 
-    if ($check_account) {
-        $_SESSION['check'] = 0;
-        call_session($check_account['user_type'], $check_account['id']);
+    $check_account = mysqli_fetch_assoc($web_con->query("SELECT * FROM user WHERE username = '$username' AND password = '$password'"));
+    $check_username = mysqli_fetch_assoc($web_con->query("SELECT * FROM user WHERE username = '$username'"));
+    $checkLastAtempt = mysqli_fetch_assoc($web_con->query("SELECT * FROM login_atempts WHERE username ='$username' ORDER BY id DESC LIMIT 1"));
+
+    $secretKey = "6LddVlgjAAAAAEgnLHmXAfTHk3G5_YNv3nm1PqmO";
+    $ip = $_SERVER['REMOTE_ADDR'];
+    // post request to server
+    $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($recaptcha);
+    $response = file_get_contents($url);
+    $responseKeys = json_decode($response, true);
+    // should return JSON with success as true
+    if ($responseKeys["success"]) {
+
+        if ($check_account) {
+            $_SESSION['check'] = 0;
+            call_session($check_account['user_type'], $check_account['id']);
+        } else {
+            if ($check_username) {
+                if ($checkLastAtempt) {
+                    $last_atempt_count = $checkLastAtempt['atempts'];
+                    if (!is_null($checkLastAtempt['atempt_rest'])) {
+                        $datetimeNow = strtotime(date("Y-m-d H:i:s"));
+                        $last_atempt_rest = strtotime($checkLastAtempt['atempt_rest']);
+                        if ($datetimeNow >= $last_atempt_rest) {
+                            mysqli_query($web_con, "INSERT INTO login_atempts (username,atempts,atempt_created) VALUES ('$username','1',NOW())");
+                        } else {
+                            //echo 'now:' . date("Y-m-d H:i:s") . ' DB: ' . $checkLastAtempt['atempt_rest'];
+                            if ($last_atempt_count != 5) {
+                                mysqli_query($web_con, "UPDATE login_atempts SET atempts = atempts +1 WHERE username ='$username' AND isNull(atempt_rest)");
+                            } else {
+                                if (mysqli_query($web_con, "UPDATE login_atempts SET atempt_rest = DATE_ADD(NOW(), INTERVAL 5 MINUTE)  WHERE username ='$username' AND isNull(atempt_rest)")) {
+                                    echo 3;
+                                    return;
+                                }
+                            }
+                        }
+                    } else {
+                        if ($last_atempt_count != 5) {
+                            mysqli_query($web_con, "UPDATE login_atempts SET atempts = atempts +1 WHERE username ='$username' AND isNull(atempt_rest)");
+                        } else {
+                            if (mysqli_query($web_con, "UPDATE login_atempts SET atempt_rest = DATE_ADD(NOW(), INTERVAL 5 MINUTE)  WHERE username ='$username' AND isNull(atempt_rest)")) {
+                                echo 3;
+                                return;
+                            }
+                        }
+                    }
+                } else {
+                    mysqli_query($web_con, "INSERT INTO login_atempts (username,atempts,atempt_created) VALUES ('$username','1',NOW())");
+                }
+            }
+            echo 2;
+            return;
+        }
     } else {
-        echo 2;
+        echo 4;
         return;
     }
 }
